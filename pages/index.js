@@ -46,7 +46,6 @@ export default function Home() {
     <div>
       <Head>
         <title>💉 Prompt injection tester 💉</title>
-        <link rel="icon" href="/dog.png" />
       </Head>
 
       <main className={styles.main}>

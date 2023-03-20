@@ -20,7 +20,7 @@ async function createChatCompletion(
   return response;
 }
 
-export default async function (req, res) {
+export default async function handler(req, res) {
   if (!configuration.apiKey) {
     res.status(500).json({
       error: {
