@@ -14,7 +14,6 @@ jobs:
       - run: npm ci && npm run build
         env:
           OPENAI_API_KEY: '${{ secrets.OPENAI_API_KEY }}'
-      - run: npm run export
       - uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
