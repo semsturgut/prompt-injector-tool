@@ -1,6 +1,21 @@
 import Head from "next/head";
 import { useState } from "react";
 import styles from "./index.module.css";
+import { initializeApp } from "firebase/app";
+import { getAnalytics, isSupported } from "firebase/analytics";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDXlittAKYUL3auhZhmwcnnekq9cFqquKw",
+  authDomain: "promptinjection.firebaseapp.com",
+  projectId: "promptinjection",
+  storageBucket: "promptinjection.appspot.com",
+  messagingSenderId: "956297536657",
+  appId: "1:956297536657:web:ede552f951859c06c68b30",
+  measurementId: "G-D37BW1S49B"
+};
+
+const app = initializeApp(firebaseConfig);
+const analytics = isSupported().then(yes => yes ? getAnalytics(app) : null);
 
 export default function Home() {
   const [promptInput, setPromptInput] = useState("");
