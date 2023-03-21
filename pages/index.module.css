@@ -15,7 +15,8 @@
 }
 
 .main,
-.main textarea {
+.main textarea,
+.main input {
   font-size: 16px;
   line-height: 24px;
   color: #353740;
@@ -27,10 +28,6 @@
   flex-direction: column;
   align-items: center;
   padding-top: 60px;
-}
-
-.main .icon {
-  width: 34px;
 }
 
 .main h3 {
