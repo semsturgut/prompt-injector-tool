@@ -1,9 +1,17 @@
 import { Configuration, OpenAIApi } from "openai";
+import { RateLimiterMemory } from 'rate-limiter-flexible';
+
+const max_tokens = 1000;
 
 const configuration = new Configuration({
   apiKey: process.env.OPENAI_API_KEY,
 });
 const openai = new OpenAIApi(configuration);
+
+const rateLimiter = new RateLimiterMemory({
+  points: 1,
+  duration: 30,
+});
 
 async function createChatCompletion(
   systemPrompt = '',
@@ -11,7 +19,7 @@ async function createChatCompletion(
 ) {
   const response = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",
-    max_tokens: 250,
+    max_tokens: max_tokens,
     messages: [
       { role: "system", content: systemPrompt },
       { role: "user", content: userPrompt },
@@ -21,6 +29,8 @@ async function createChatCompletion(
 }
 
 export default async function handler(req, res) {
+  const isAllowed = await rateLimiterMiddleware(req, res);
+  if (!isAllowed) return;
   if (!configuration.apiKey) {
     res.status(500).json({
       error: {
@@ -33,7 +43,7 @@ export default async function handler(req, res) {
   const prompt = req.body.prompt || '';
   const systemPrompt = req.body.systemPrompt || '';
 
-  if (prompt.trim().length === 0 || prompt.trim().length > 250 || systemPrompt.trim().length === 0 || systemPrompt.trim().length > 250) {
+  if (prompt.trim().length === 0 || prompt.trim().length > max_tokens || systemPrompt.trim().length === 0 || systemPrompt.trim().length > max_tokens) {
     res.status(400).json({
       error: {
         message: "Please enter a valid prompt",
@@ -62,5 +72,19 @@ export default async function handler(req, res) {
         }
       });
     }
+  }
+}
+
+async function rateLimiterMiddleware(req, res) {
+  try {
+    const clientIP = req.headers['x-forwarded-for'] || req.socket.remoteAddress;
+    await rateLimiter.consume(clientIP);
+    return true;
+  } catch (error) {
+    return res.status(429).json({
+      error: {
+        message: 'Too many requests from this IP, please try again after 30 seconds',
+      }
+    });
   }
 }
